@@ -46,8 +46,8 @@ contract verifystud {
         return keccak256(abi.encodePacked(_address, _id));
     }
 
-    function addStudToPending(string memory _name, address _student_address, string memory _email, string memory _id, address _instAddress) public onlystudent{
-        require(conditionCheck(_student_address, _id), "Student already exists in pending list");
+    function addStudToPending(string memory _name, address _student_address, string memory _email, string memory _id, address _instAddress) public{
+        
 
         pendingstudents memory newpendingstudent;
         newpendingstudent.name = _name;
@@ -57,34 +57,16 @@ contract verifystud {
         newpendingstudent.instAddress = _instAddress;
         pendingStudentsarray.push(newpendingstudent);
     }
-    function conditionCheck(address _student_address, string memory _id) public view returns (bool) {
-        bytes32 key = studreg.generateKey(
-            _student_address,
-            _id
-        );
-        (,,,,address currentInstAddress)=studreg.getRegisteredStudentByKey(key);
-        if(currentInstAddress == address(0)){
-            return true;
-        }
-        return false;
-    }
-    function CheckReturn(address student_address,string memory id) public view returns (bool){
-        bytes32 key = studreg.generateKey(
-            student_address,
-            id
-        );
-        (,,,,address currentInstAddress)=studreg.getRegisteredStudentByKey(key);
-        return (msg.sender == currentInstAddress);
-    }
+    
 
-    function addTransferStudToPending(string memory _name, address _student_address, string memory _email, string memory _id, address _currentInstAddress, address _newinstAddress) public onlyverfiedInstitute{
+    function addTransferStudToPending(string memory _name, address _student_address, string memory _email, string memory _id, address _currentInstAddress, address _newinstAddress) public{
         bytes32 key = studreg.generateKey(
             _student_address,
             _id
         );
         
-        (,,,,address currentInstAddress)=studreg.getRegisteredStudentByKey(key);
-        require(!(currentInstAddress == address(0)) && currentInstAddress == _currentInstAddress, "Not the Student's Institute");
+        // (,,,,address currentInstAddress)=studreg.getRegisteredStudentByKey(key);
+        // require(!(currentInstAddress == address(0)) && currentInstAddress == _currentInstAddress, "Not the Student's Institute");
 
         pendingstudents memory newpendingstudent;
         newpendingstudent.name = _name;
@@ -95,42 +77,20 @@ contract verifystud {
         transferStudentsarray.push(newpendingstudent);
     }
 
-    function verifystudent(uint256 index) public onlyverfiedInstitute  {
-        (string memory name,address student_address,string memory email,string memory id,address instaddress)=getPendingStudentByindex(index);
-        require(msg.sender == instaddress, "Not the Stuent's Institute");
-        
-        // address studContractaddress = studreg.getRegisteredStudentsContract(
-        //     student_address
-        // );
-        // require(studContractaddress != address(0), "Invalid student contract address(Studetnt not Registerd))");
-        
-        bytes32 key = studreg.generateKey(
-            student_address,
-            id
-        );
-        require(studreg.addInstTostudInfo(index, key, msg.sender), "Failed to add institute to student info");
+    function verifystudent(uint256 index) public  {
+        // (string memory name,address student_address,string memory email,string memory id,address instaddress)=getPendingStudentByindex(index);
+               
+    
+        // require(studreg.addInstTostudInfo(index, key, instaddress), "Failed to add institute to student info");
         delete pendingStudentsarray[index];
-        // student(studContractaddress).addInstToProfile(msg.sender);
 
     }
 
      function verifyTransferstudent(uint256 index) public {
-        (string memory name,address student_address,string memory email,string memory id,address instaddress)=getTransferStudentByindex(index);
-        require(msg.sender == instaddress, "Not the Stuent's Institute");
-        
-        // address studContractaddress = studreg.getRegisteredStudentsContract(
-        //     student_address
-        // );
-        // require(studContractaddress != address(0), "Invalid student contract address(Studetnt not Registerd))");
-        
-        bytes32 key = studreg.generateKey(
-            student_address,
-            id
-        );
-        require(studreg.addInstTostudInfo(index, key, msg.sender), "Failed to add institute to student info");
+        // (string memory name,address student_address,string memory email,string memory id,address instaddress)=getTransferStudentByindex(index);
+                
+        // require(studreg.addInstTostudInfo(index, key, instaddress), "Failed to add institute to student info");
         delete transferStudentsarray[index];
-
-        // student(studContractaddress).addInstToProfile(msg.sender);
 
     }
     function removeGraduateStud(uint256 index,address student_address,string memory id) public {
@@ -140,7 +100,7 @@ contract verifystud {
         );
         
         (,,,,address currentInstAddress)=studreg.getRegisteredStudentByKey(key);
-        require(msg.sender == currentInstAddress);
+        // require(msg.sender == currentInstAddress);
         require(studreg.removeInstFromstudInfo(index, key), "Failed to remove institute from student info");
     }
 

@@ -21,10 +21,10 @@ contract institute {
         MOE_address = _MOE_address;
         //endorsecount = 0;
     }
-    modifier OnlyInstitute() {
-        require(msg.sender == institute_address);
-        _;
-    }
+    // modifier OnlyInstitute() {
+    //     require(msg.sender == institute_address);
+    //     _;
+    // }
     modifier OnlyMOE() {
         require(msg.sender == MOE_address);
         _;
@@ -38,6 +38,7 @@ contract institute {
         string enddate;
         bool verified;
         string description;
+        string cert_hash; 
     }
     struct studentandtype {
         address student;
@@ -61,8 +62,10 @@ contract institute {
         string memory _startdate,
         string memory _enddate,
         string memory _description,
-        string memory _cert_type
-    ) public OnlyInstitute returns (bytes32) {
+        string memory _cert_type,
+        address _instAddress,
+        string memory cert_hash
+    ) public returns (bytes32) {
         official_cert_info memory new_official_cert;
         studentandtype memory newstudenttotype;
         newstudenttotype.student = _student;
@@ -70,11 +73,15 @@ contract institute {
         bytes32 key = generateKey(_student, _cert_type);
         new_official_cert.student_name = _student_name;
         new_official_cert.student = _student;
-        new_official_cert.institute = msg.sender;
+        new_official_cert.institute = _instAddress;
         new_official_cert.startdate = _startdate;
         new_official_cert.enddate = _enddate;
         new_official_cert.verified = false;
         new_official_cert.description = _description;
+        new_official_cert.cert_type = _cert_type;
+        new_official_cert.cert_hash = cert_hash;
+        
+        indexcount++;
         official_certmap[key] = new_official_cert;
         indexTovalue[indexcount] = newstudenttotype;
         certified_students.push(_student);

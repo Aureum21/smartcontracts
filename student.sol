@@ -61,8 +61,7 @@ contract student {
         id = _id;
     }
 
-    function addInstToProfile(address _instAddress) public onlyverfiedInstitute  {
-        require(msg.sender == _instAddress);
+    function addInstToProfile(address _instAddress) public {
         listOfInstitutes.push(_instAddress);
         instAddress = _instAddress;
     }
@@ -78,6 +77,7 @@ contract student {
         string certificate_name;
         bool verified;
         bool visible;
+        string cert_hash; // the hash of the certificate
     }
     // the key is the certificate name eg bachelors and the value is the struct and the name inside is the employee name.
     mapping(string => certificationInfo) certificationmap;
@@ -86,12 +86,14 @@ contract student {
     function addCertification(
         string memory _name,
         address _institute,
-        string memory _certificate_name
-    ) public OnlyStudent {
+        string memory _certificate_name,
+        string memory _cert_hash
+    ) public {
         certificationInfo memory newcertificationInfo;
         newcertificationInfo.name = _name;
         newcertificationInfo.institute = _institute;
         newcertificationInfo.certificate_name = _certificate_name;
+        newcertificationInfo.cert_hash = _cert_hash;
         newcertificationInfo.verified = false;
         newcertificationInfo.visible = true;
         certificationmap[_certificate_name] = newcertificationInfo;
@@ -105,11 +107,12 @@ contract student {
 
     function getCertificationBycertName(
         string memory _certname
-    ) private view returns (string memory, address, string memory, bool, bool) {
+    ) private view returns (string memory, address, string memory, string memory,bool, bool) {
         return (
             certificationmap[_certname].name,
             certificationmap[_certname].institute,
             certificationmap[_certname].certificate_name,
+            certificationmap[_certname].cert_hash,
             certificationmap[_certname].verified,
             certificationmap[_certname].visible
         );
@@ -121,7 +124,7 @@ contract student {
 
     function getCertificationByIndex(
         uint256 _index
-    ) public view returns (string memory, address, string memory, bool, bool) {
+    ) public view returns (string memory, address, string memory, string memory, bool, bool) {
         return getCertificationBycertName(certifications[_index]);
     }
     // to be used in the front end  to say if i wanna show the certificate or not
@@ -141,6 +144,7 @@ contract student {
         bool verified;
         string description;
         bool visible;
+        string cert_hash;
     }
     // try using mapping to map(same institution different roles)
     mapping(address => workexpInfo) workexpmap;
@@ -151,13 +155,15 @@ contract student {
         address _institute,
         string memory _startdate,
         string memory _enddate,
-        string memory _description
-    ) public OnlyStudent {
+        string memory _description,
+        string memory _cert_hash
+    ) public {
         workexpInfo memory newworkexp;
         newworkexp.role = _role;
         newworkexp.institute = _institute;
         newworkexp.startdate = _startdate;
         newworkexp.enddate = _enddate;
+        newworkexp.cert_hash = _cert_hash;
         newworkexp.verified = false;
         newworkexp.visible = true;
         newworkexp.description = _description;
@@ -177,6 +183,7 @@ contract student {
         view
         returns (
             string memory,
+            string memory,
             address,
             string memory,
             string memory,
@@ -187,6 +194,7 @@ contract student {
     {
         return (
             workexpmap[_institute].role,
+            workexpmap[_institute].cert_hash,
             workexpmap[_institute].institute,
             workexpmap[_institute].startdate,
             workexpmap[_institute].enddate,
@@ -206,6 +214,7 @@ contract student {
         public
         view
         returns (
+            string memory,
             string memory,
             address,
             string memory,
@@ -235,6 +244,7 @@ contract student {
         // the thing written when endorsed
         string review;
         bool visible;
+        string cert_hash;
     }
     // the first string is the skill eg programming  the value is the struct and the name inside is the student name, eg abekebe
     mapping(string => skillInfo) skillmap;
@@ -244,7 +254,7 @@ contract student {
         string memory _name,
         string memory _student_name,
         string memory _experience
-    ) public OnlyStudent {
+    ) public {
         //created an instance of the employee skill set
         skillInfo memory employeeSkillSet;
         // filled the instance variables
